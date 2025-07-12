@@ -8,6 +8,7 @@ Original file is located at
 """
 
 # advanced_employability_app_final.py
+# streamlit_app.py
 
 import streamlit as st
 import pandas as pd
@@ -15,6 +16,8 @@ import joblib
 import numpy as np
 
 # Load the trained model and scaler
+# This block handles loading the necessary files for prediction.
+# It includes error handling in case the files are not found.
 try:
     model = joblib.load('employability_predictor.pkl')
     scaler = joblib.load('scaler.pkl')
@@ -22,9 +25,9 @@ except FileNotFoundError:
     st.error("Error: Model or scaler files not found. Please ensure 'employability_predictor.pkl' and 'scaler.pkl' are in the same directory.")
     st.stop() # Stop the app if files are not found
 
-# Define the expected feature names based on your training data
-# This is crucial for ensuring the input data matches the model's expectations
-# You can get these from X.columns after data preprocessing in your notebook
+# Define the expected feature names based on your training data.
+# This list is crucial for ensuring that the input data from the Streamlit app
+# matches the exact order and names of features the model was trained on.
 expected_features = [
     'CGPA', 'PROJECTS', 'INTERNSHIPS', 'WORKSHOPS', 'CERTIFICATIONS',
     'AWARDS', 'SCHOLARSHIPS', 'EXTRACURRICULAR', 'SOFT_SKILLS',
@@ -35,59 +38,68 @@ expected_features = [
     'STUDENT_PERFORMANCE_RATING'
 ]
 
-# --- Streamlit App Layout ---
-
+# --- Streamlit App Configuration ---
+# Sets up the basic page settings like title, icon, and layout.
 st.set_page_config(
     page_title="Student Employability Predictor",
     page_icon="🎓",
-    layout="centered",
-    initial_sidebar_state="expanded"
+    layout="centered", # 'centered' or 'wide'
+    initial_sidebar_state="expanded" # 'auto', 'expanded', or 'collapsed'
 )
 
-# Custom CSS for a professional look
+# --- Custom CSS for Professional and Nice Look ---
+# This section injects custom CSS to style various Streamlit components
+# and create a visually appealing user interface.
 st.markdown("""
     <style>
+    /* Main header styling */
     .main-header {
         font-size: 3em;
-        color: #2E86C1;
+        color: #2E86C1; /* A shade of blue */
         text-align: center;
         margin-bottom: 0.5em;
         font-weight: bold;
     }
+    /* Sub-header styling */
     .sub-header {
         font-size: 1.5em;
-        color: #34495E;
+        color: #34495E; /* Darker grey */
         text-align: center;
         margin-bottom: 1.5em;
     }
+    /* Button styling */
     .stButton>button {
-        background-color: #28B463;
+        background-color: #28B463; /* Green */
         color: white;
         font-size: 1.2em;
         padding: 0.8em 1.5em;
         border-radius: 0.5em;
         border: none;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s; /* Smooth transition on hover */
     }
     .stButton>button:hover {
-        background-color: #239B56;
+        background-color: #239B56; /* Darker green on hover */
     }
+    /* Text input styling */
     .stTextInput>div>div>input {
         border-radius: 0.5em;
-        border: 1px solid #D5DBDB;
+        border: 1px solid #D5DBDB; /* Light grey border */
         padding: 0.5em;
     }
+    /* Selectbox styling */
     .stSelectbox>div>div {
         border-radius: 0.5em;
         border: 1px solid #D5DBDB;
         padding: 0.3em;
     }
+    /* Slider styling */
     .stSlider>div>div>div>div {
-        background-color: #2E86C1;
+        background-color: #2E86C1; /* Blue slider track */
     }
+    /* Prediction box styling (general) */
     .prediction-box {
-        background-color: #EBF5FB;
-        border-left: 8px solid #2E86C1;
+        background-color: #EBF5FB; /* Light blue background */
+        border-left: 8px solid #2E86C1; /* Blue left border */
         padding: 1.5em;
         border-radius: 0.8em;
         margin-top: 2em;
@@ -96,41 +108,66 @@ st.markdown("""
         font-weight: bold;
         color: #2E86C1;
     }
+    /* Prediction box styling (Employable) */
     .prediction-box.employable {
-        border-left-color: #28B463;
-        color: #28B463;
-        background-color: #E8F8F5;
+        border-left-color: #28B463; /* Green border */
+        color: #28B463; /* Green text */
+        background-color: #E8F8F5; /* Light green background */
     }
+    /* Prediction box styling (Less Employable) */
     .prediction-box.less-employable {
-        border-left-color: #E74C3C;
-        color: #E74C3C;
-        background-color: #FDEDEC;
+        border-left-color: #E74C3C; /* Red border */
+        color: #E74C3C; /* Red text */
+        background-color: #FDEDEC; /* Light red background */
     }
+    /* Alert box styling */
     .stAlert {
         border-radius: 0.5em;
     }
+    /* Footer information styling */
     .footer-info {
         font-size: 0.85em;
-        color: #7F8C8D;
+        color: #7F8C8D; /* Grey text */
         text-align: center;
         margin-top: 3em;
     }
+    /* Header container for image and title alignment */
+    .header-container {
+        display: flex; /* Use flexbox for alignment */
+        align-items: center; /* Vertically align items in the center */
+        justify-content: center; /* Horizontally center items */
+        gap: 15px; /* Space between image and text */
+        margin-bottom: 1em;
+    }
     </style>
-    """, unsafe_allow_html=True)
+    """, unsafe_allow_html=True) # unsafe_allow_html is needed to inject custom HTML/CSS
 
-st.markdown('<p class="main-header">🎓 Student Employability Predictor</p>', unsafe_allow_html=True)
+# --- Header Section with Image and Title ---
+# This section creates the main header of the application, including an icon/logo
+# and the main title, aligned horizontally using the custom CSS.
+st.markdown('<div class="header-container">', unsafe_allow_html=True)
+# Ensure 'employability_icon.png' is in the same directory as this script.
+# Adjust 'width' as needed for your image size.
+st.image("employability_icon.png", width=100)
+# The main title, with a slight adjustment to margin-bottom to fit the flex layout.
+st.markdown('<p class="main-header" style="margin-bottom:0;">Student Employability Predictor</p>', unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True) # Close the header container div
+
+# Sub-header providing a brief description of the app's purpose.
 st.markdown('<p class="sub-header">Predicting student employability based on various academic and skill metrics.</p>', unsafe_allow_html=True)
 
-st.write("---")
+st.write("---") # A horizontal line for visual separation
 
-# --- Input Features ---
+# --- Input Features Section ---
+# This section provides interactive widgets for users to input student data.
 st.header("Student Profile Input")
 
-# Using columns for better layout
+# Using columns to organize input fields into two vertical sections for better readability.
 col1, col2 = st.columns(2)
 
 with col1:
     st.subheader("Academic & Project Details")
+    # Sliders for numerical inputs, with default values and ranges.
     cgpa = st.slider("CGPA (Cumulative Grade Point Average)", 0.0, 10.0, 7.5, 0.1)
     projects = st.slider("Number of Projects Completed", 0, 10, 3)
     internships = st.slider("Number of Internships", 0, 5, 1)
@@ -143,7 +180,7 @@ with col1:
 
 with col2:
     st.subheader("Skill Assessment")
-    # Likert scale for skills (1-5)
+    # Sliders for skill ratings, typically on a Likert-type scale (1-5).
     soft_skills = st.slider("Soft Skills Rating (1-5)", 1, 5, 3)
     aptitude_test_score = st.slider("Aptitude Test Score (0-100)", 0, 100, 60)
     communication_skills = st.slider("Communication Skills Rating (1-5)", 1, 5, 3)
@@ -158,11 +195,14 @@ with col2:
     presentation_skills = st.slider("Presentation Skills Rating (1-5)", 1, 5, 3)
     networking_skills = st.slider("Networking Skills Rating (1-5)", 1, 5, 3)
 
-st.write("---")
+st.write("---") # Another horizontal line
 
-# --- Prediction Button ---
+# --- Prediction Button and Logic ---
+# This block executes when the "Predict Employability" button is clicked.
+# It performs data preparation, scaling, prediction, and displays the results.
 if st.button("Predict Employability"):
-    # Create a DataFrame from the input values
+    # Create a Pandas DataFrame from the collected input values.
+    # The 'columns' argument ensures the feature names and order match 'expected_features'.
     input_data = pd.DataFrame([[
         cgpa, projects, internships, workshops, certifications, awards,
         scholarships, extracurricular, soft_skills, aptitude_test_score,
@@ -172,22 +212,26 @@ if st.button("Predict Employability"):
         presentation_skills, networking_skills, student_performance_rating
     ]], columns=expected_features)
 
-    # Scale the input data
-    # Ensure the scaler is fitted on the same features as the model was trained on
+    # Scale the input data using the pre-fitted scaler.
+    # This step is crucial as the model expects scaled input.
+    # Includes error handling for potential issues during scaling.
     try:
         scaled_input = scaler.transform(input_data)
     except Exception as e:
         st.error(f"Error during scaling: {e}. This might happen if the number of input features does not match the scaler's expected features.")
         st.stop()
 
-    # Make prediction
+    # Make the employability prediction (0 or 1).
     prediction = model.predict(scaled_input)
+    # Get the probability scores for each class (Employable/Less Employable).
     prediction_proba = model.predict_proba(scaled_input)
 
+    # Extract probabilities for better user feedback.
     employable_proba = prediction_proba[0][1] # Probability of being Employable (CLASS=1)
     less_employable_proba = prediction_proba[0][0] # Probability of being Less Employable (CLASS=0)
 
     st.subheader("Prediction Result:")
+    # Display the prediction result with distinct styling based on the outcome.
     if prediction[0] == 1:
         st.markdown(f"""
             <div class="prediction-box employable">
@@ -197,7 +241,7 @@ if st.button("Predict Employability"):
                 Probability of being Employable: <strong>{employable_proba:.2%}</strong>
             </p>
             """, unsafe_allow_html=True)
-        st.balloons()
+        st.balloons() # Fun animation for positive outcome
     else:
         st.markdown(f"""
             <div class="prediction-box less-employable">
@@ -209,10 +253,12 @@ if st.button("Predict Employability"):
             """, unsafe_allow_html=True)
         st.warning("Consider focusing on skill development and academic performance to improve employability.")
 
-st.write("---")
+st.write("---") # Another horizontal line
+# Informational message about the nature of the prediction.
 st.info("This prediction is based on a machine learning model and should be used as a guide. Actual employability depends on many factors.")
 
-# Optional: Add a section to explain the features or model
+# --- Expander for "About This Predictor" ---
+# Provides additional details about the model and features, hidden by default.
 with st.expander("About This Predictor"):
     st.write("""
         This application uses a machine learning model (specifically, an SVM model)
@@ -229,6 +275,7 @@ with st.expander("About This Predictor"):
     """)
 
 # --- Footer Information ---
+# Displays version, update, developer, and copyright information at the bottom of the page.
 st.markdown("""
     <div class="footer-info">
         Version 1.0 | Last updated: Aug-2025 | Developed by Mr.CHOONG MUH IN (TP068331)
