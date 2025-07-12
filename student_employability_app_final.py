@@ -42,7 +42,7 @@ expected_features = [
 # Sets up the basic page settings like title, icon, and layout.
 st.set_page_config(
     page_title="Student Employability Predictor",
-    page_icon="🎓",
+    page_icon="🎓", # You can keep this emoji icon, it doesn't require a file
     layout="centered", # 'centered' or 'wide'
     initial_sidebar_state="expanded" # 'auto', 'expanded', or 'collapsed'
 )
@@ -131,24 +131,20 @@ st.markdown("""
         text-align: center;
         margin-top: 3em;
     }
-    /* Header container for image and title alignment */
+    /* Header container for title alignment (image removed) */
     .header-container {
         display: flex; /* Use flexbox for alignment */
         align-items: center; /* Vertically align items in the center */
         justify-content: center; /* Horizontally center items */
-        gap: 15px; /* Space between image and text */
+        /* gap: 15px; Removed as there's no image to gap with */
         margin-bottom: 1em;
     }
     </style>
     """, unsafe_allow_html=True) # unsafe_allow_html is needed to inject custom HTML/CSS
 
-# --- Header Section with Image and Title ---
-# This section creates the main header of the application, including an icon/logo
-# and the main title, aligned horizontally using the custom CSS.
+# --- Header Section (Image Removed) ---
+# This section creates the main header of the application, now only with the title.
 st.markdown('<div class="header-container">', unsafe_allow_html=True)
-# Ensure 'employability_icon.png' is in the same directory as this script.
-# Adjust 'width' as needed for your image size.
-st.image("employability_icon.png", width=100)
 # The main title, with a slight adjustment to margin-bottom to fit the flex layout.
 st.markdown('<p class="main-header" style="margin-bottom:0;">Student Employability Predictor</p>', unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True) # Close the header container div
@@ -282,3 +278,4 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 st.caption("© 2025 CHOONG MUH IN / APU University | Graduate Employability Prediction App | For research purposes only.")
+
