@@ -1,0 +1,4 @@
+     import joblib
+     joblib.dump(best_model, 'employability_predictor.pkl')
+     joblib.dump(scaler, 'scaler.pkl')
+     
